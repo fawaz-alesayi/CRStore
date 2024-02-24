@@ -9,7 +9,7 @@ import {
   finalize,
 } from "./operations";
 import type { Connection, Schema } from "../core/types";
-import { Kysely, SqliteDialect } from "kysely";
+import { Kysely, SqliteDialect, type SqliteDatabase } from "kysely";
 import type { CRSchema } from "./schema";
 import { load } from "crstore/runtime";
 import { CRDialect } from "./dialect";
@@ -27,16 +27,23 @@ async function init<T extends CRSchema>(
   file: string,
   schema: T,
   paths = defaultPaths,
+  customKyselyInstance?: ({ database, browser }: {
+    database: (SqliteDatabase | (() => Promise<SqliteDatabase>));
+    browser: boolean;
+  }) => Kysely<unknown>,
 ) {
   type DB = Schema<T>;
   if (connections.has(file)) return connections.get(file) as Connection<DB>;
 
   const { database, browser } = await load(file, paths);
   const Dialect = browser ? CRDialect : SqliteDialect;
-  const kysely = new Kysely<DB>({
+  const kysely = (customKyselyInstance?.({
+    database,
+    browser,
+  }) ?? new Kysely<DB>({
     dialect: new Dialect({ database }),
     plugins: [new JSONPlugin()],
-  });
+  })) as Kysely<DB>;
 
   const close = kysely.destroy.bind(kysely);
   await kysely.transaction().execute((db) => apply(db, schema));
