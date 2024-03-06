@@ -12,6 +12,7 @@ import type {
   Pull,
   Push,
   View,
+  Connection,
 } from "./types";
 import { affectedTables } from "../database/operations";
 import type { CRSchema } from "../database/schema";
@@ -19,6 +20,7 @@ import { defaultPaths, init } from "../database";
 import { reactive, ready } from "./reactive";
 import type { CompiledQuery } from "kysely";
 import { queue } from "../database/queue";
+import type { Database } from "better-sqlite3";
 
 function database<T extends CRSchema>(
   schema: T,
@@ -33,9 +35,17 @@ function database<T extends CRSchema>(
   } = {},
 ): CoreDatabase<Schema<T>> {
   const dummy = !ssr && !!import.meta.env?.SSR;
-  const connection = dummy
-    ? new Promise<never>(() => {})
-    : init(name, schema, paths);
+  const { connection, database: db } = (dummy
+    ? new Promise<never>(() => {
+      return {
+        connection: {},
+        database: {}
+      }
+    })
+    : init(name, schema, paths)) as unknown as {
+      connection: Promise<Connection<Schema<T>>>;
+      database: Database;
+    }
   const channel =
     "BroadcastChannel" in globalThis
       ? new globalThis.BroadcastChannel(`${name}-sync`)
@@ -48,7 +58,7 @@ function database<T extends CRSchema>(
   globalThis.addEventListener?.("online", pull);
 
   const listeners = new Map<string, Set<Updater>>();
-  let hold = () => {};
+  let hold = () => { };
   pull();
 
   async function refresh(query: CompiledQuery, id: QueryId) {
@@ -177,6 +187,7 @@ function database<T extends CRSchema>(
     merge,
     update,
     subscribe,
+    db,
     connection,
     replica: store.bind({
       connection,

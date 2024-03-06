@@ -1,3 +1,4 @@
+import type {Database} from "better-sqlite3";
 import type {
   AggregateFunctionNode,
   SelectQueryNode,
@@ -151,6 +152,7 @@ interface Connection<S> extends Kysely<S> {
 
 interface CoreDatabase<S> {
   connection: Promise<Connection<S>>;
+  db: Database;
   replica: CoreStore<S>;
 
   update<T extends any[], R>(

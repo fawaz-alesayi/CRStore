@@ -36,7 +36,7 @@ const config = {
       {
         find: "crstore/runtime",
         customResolver: (_0: any, _1: any, { ssr }: { ssr?: boolean }) =>
-          ssr ? resolve("./runtime/node.js") : resolve("./runtime/browser.js"),
+          ssr ? process.versions.bun ? resolve("./runtime/bun.js") : resolve("./runtime/node.js") : resolve("./runtime/browser.js"),
       } as any,
     ],
   },
