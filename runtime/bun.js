@@ -14,7 +14,10 @@ export async function load(file, paths) {
     );
   }
 
-  const database = new SQLite(file);
+  const database = new SQLite(file, {
+    create: true,
+  });
+  
   database.run("PRAGMA journal_mode = wal");
   database.loadExtension(paths.extension || extensionPath);
 
