@@ -5,7 +5,7 @@ import { platform } from "os";
 /**
  * @param {string} file
  * @param {{ binding?: string; extension?: string; }} paths
- * @returns {Promise<{ database: any, env: "bun" }>}
+ * @returns {Promise<{ database: SQLite, env: "bun" }>}
  */
 export async function load(file, paths) {
   if (platform() === "darwin") {
