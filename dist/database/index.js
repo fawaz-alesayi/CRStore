@@ -32,9 +32,6 @@ async function init(file, schema, paths = defaultPaths) {
         },
     });
     connections.set(file, connection);
-    return {
-        connection,
-        database,
-    };
+    return [connection, database];
 }
 export { init, defaultPaths };

@@ -4,12 +4,9 @@ import { reactive, ready } from "./reactive.js";
 import { queue } from "../database/queue.js";
 function database(schema, { ssr = false, name = "crstore.db", paths = defaultPaths, error = undefined, push: remotePush = undefined, pull: remotePull = undefined, online = () => !!globalThis.navigator?.onLine, } = {}) {
     const dummy = !ssr && !!import.meta.env?.SSR;
-    const { connection, database: db } = (dummy
+    const [connection, db] = (dummy
         ? new Promise(() => {
-            return {
-                connection: {},
-                database: {}
-            };
+            return [{}, {}];
         })
         : init(name, schema, paths));
     const channel = "BroadcastChannel" in globalThis

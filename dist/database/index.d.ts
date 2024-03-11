@@ -9,8 +9,5 @@ declare function init<T extends CRSchema>(file: string, schema: T, paths?: {
     wasm?: string | undefined;
     binding?: string | undefined;
     extension?: string | undefined;
-}): Promise<Connection<Schema<T>> | {
-    connection: Connection<Schema<T>>;
-    database: any;
-}>;
+}): Promise<Connection<Schema<T>> | readonly [Connection<Schema<T>>, any]>;
 export { init, defaultPaths };
