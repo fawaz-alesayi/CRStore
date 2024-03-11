@@ -6,15 +6,21 @@ import { JSONPlugin } from "./json.js";
 import { apply } from "./schema.js";
 const connections = new Map();
 const defaultPaths = {};
-async function init(file, schema, paths = defaultPaths) {
+async function init(file, schema, paths = defaultPaths, customKyselyInstance) {
     if (connections.has(file))
         return connections.get(file);
-    const { database, env } = await load(file, paths);
-    const Dialect = env === "browser" ? CRDialect : SqliteDialect;
-    const kysely = new Kysely({
-        dialect: new Dialect({ database }),
-        plugins: [new JSONPlugin()],
-    });
+    let kysely;
+    if (!customKyselyInstance) {
+        const { database, env } = await load(file, paths);
+        const Dialect = env === "browser" ? CRDialect : SqliteDialect;
+        kysely = new Kysely({
+            dialect: new Dialect({ database }),
+            plugins: [new JSONPlugin()],
+        });
+    }
+    else {
+        kysely = customKyselyInstance;
+    }
     const close = kysely.destroy.bind(kysely);
     await kysely.transaction().execute((db) => apply(db, schema));
     const connection = Object.assign(kysely, {
@@ -32,6 +38,6 @@ async function init(file, schema, paths = defaultPaths) {
         },
     });
     connections.set(file, connection);
-    return [connection, database];
+    return connection;
 }
 export { init, defaultPaths };

@@ -1,4 +1,3 @@
-import type { Database } from "better-sqlite3";
 import type { AggregateFunctionNode, SelectQueryNode, ReferenceNode, SelectAllNode, CompiledQuery, ColumnNode, TableNode, AliasNode, RawNode, Kysely } from "kysely";
 /** A set of changes that is encoded to be used over the wire */
 type EncodedChanges = string;
@@ -94,7 +93,6 @@ interface Connection<S> extends Kysely<S> {
 }
 interface CoreDatabase<S> {
     connection: Promise<Connection<S>>;
-    db: Database;
     replica: CoreStore<S>;
     update<T extends any[], R>(operation: Operation<T, R, S>, ...args: T): Promise<R>;
     merge(changes: EncodedChanges): Promise<void>;

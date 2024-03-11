@@ -152,7 +152,6 @@ interface Connection<S> extends Kysely<S> {
 
 interface CoreDatabase<S> {
   connection: Promise<Connection<S>>;
-  db: Database;
   replica: CoreStore<S>;
 
   update<T extends any[], R>(

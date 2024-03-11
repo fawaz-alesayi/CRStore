@@ -27,15 +27,22 @@ async function init<T extends CRSchema>(
   file: string,
   schema: T,
   paths = defaultPaths,
+  customKyselyInstance?: Kysely<Schema<T>>,
 ) {
   type DB = Schema<T>;
   if (connections.has(file)) return connections.get(file) as Connection<DB>;
-  const { database, env } = await load(file, paths);
-  const Dialect = env === "browser" ? CRDialect : SqliteDialect;
-  const kysely = new Kysely<DB>({
-    dialect: new Dialect({ database }),
-    plugins: [new JSONPlugin()],
-  });
+
+  let kysely: Kysely<DB>;
+  if (!customKyselyInstance) {
+    const { database, env } = await load(file, paths);
+    const Dialect = env === "browser" ? CRDialect : SqliteDialect;
+    kysely = new Kysely<DB>({
+      dialect: new Dialect({ database }),
+      plugins: [new JSONPlugin()],
+    });
+  } else {
+    kysely = customKyselyInstance;
+  }
 
   const close = kysely.destroy.bind(kysely);
   await kysely.transaction().execute((db) => apply(db, schema));
@@ -56,7 +63,7 @@ async function init<T extends CRSchema>(
   }) as Connection<DB>;
 
   connections.set(file, connection);
-  return [connection, database] as const;
+  return connection;
 }
 
 export { init, defaultPaths };

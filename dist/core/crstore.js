@@ -2,13 +2,11 @@ import { affectedTables } from "../database/operations.js";
 import { defaultPaths, init } from "../database/index.js";
 import { reactive, ready } from "./reactive.js";
 import { queue } from "../database/queue.js";
-function database(schema, { ssr = false, name = "crstore.db", paths = defaultPaths, error = undefined, push: remotePush = undefined, pull: remotePull = undefined, online = () => !!globalThis.navigator?.onLine, } = {}) {
+function database(schema, { ssr = false, name = "crstore.db", paths = defaultPaths, error = undefined, push: remotePush = undefined, pull: remotePull = undefined, kysely = undefined, online = () => !!globalThis.navigator?.onLine, } = {}) {
     const dummy = !ssr && !!import.meta.env?.SSR;
-    const [connection, db] = (dummy
-        ? new Promise(() => {
-            return [{}, {}];
-        })
-        : init(name, schema, paths));
+    const connection = (dummy
+        ? new Promise(() => { })
+        : init(name, schema, paths, kysely));
     const channel = "BroadcastChannel" in globalThis
         ? new globalThis.BroadcastChannel(`${name}-sync`)
         : null;
@@ -127,7 +125,6 @@ function database(schema, { ssr = false, name = "crstore.db", paths = defaultPat
         merge,
         update,
         subscribe,
-        db,
         connection,
         replica: store.bind({
             connection,

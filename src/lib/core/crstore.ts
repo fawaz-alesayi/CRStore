@@ -18,7 +18,7 @@ import { affectedTables } from "../database/operations";
 import type { CRSchema } from "../database/schema";
 import { defaultPaths, init } from "../database";
 import { reactive, ready } from "./reactive";
-import type { CompiledQuery } from "kysely";
+import type { CompiledQuery, Kysely } from "kysely";
 import { queue } from "../database/queue";
 import type { Database } from "better-sqlite3";
 
@@ -31,15 +31,14 @@ function database<T extends CRSchema>(
     error = undefined as Error,
     push: remotePush = undefined as Push,
     pull: remotePull = undefined as Pull,
+    kysely = undefined as Kysely<Schema<T>> | undefined,
     online = () => !!(globalThis as any).navigator?.onLine,
   } = {},
 ): CoreDatabase<Schema<T>> {
   const dummy = !ssr && !!import.meta.env?.SSR;
-  const [connection, db] = (dummy
-    ? new Promise<never>(() => {
-      return [{}, {}] as never;
-    })
-    : init(name, schema, paths)) as unknown as [Promise<Connection<Schema<T>>>, Database];
+  const connection = (dummy
+    ? new Promise<never>(() => {})
+    : init(name, schema, paths, kysely))
   const channel =
     "BroadcastChannel" in globalThis
       ? new globalThis.BroadcastChannel(`${name}-sync`)
@@ -181,7 +180,6 @@ function database<T extends CRSchema>(
     merge,
     update,
     subscribe,
-    db,
     connection,
     replica: store.bind({
       connection,
