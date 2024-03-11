@@ -56,13 +56,7 @@ async function init<T extends CRSchema>(
   }) as Connection<DB>;
 
   connections.set(file, connection);
-  return {
-    connection,
-    database,
-  } satisfies {
-    connection: any;
-    database: DB;
-  }
+  return [connection, database] as const;
 }
 
 export { init, defaultPaths };

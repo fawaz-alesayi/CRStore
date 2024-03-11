@@ -35,17 +35,11 @@ function database<T extends CRSchema>(
   } = {},
 ): CoreDatabase<Schema<T>> {
   const dummy = !ssr && !!import.meta.env?.SSR;
-  const { connection, database: db } = (dummy
+  const [connection, db] = (dummy
     ? new Promise<never>(() => {
-      return {
-        connection: {},
-        database: {}
-      }
+      return [{}, {}] as never;
     })
-    : init(name, schema, paths)) as unknown as {
-      connection: Promise<Connection<Schema<T>>>;
-      database: Database;
-    }
+    : init(name, schema, paths)) as unknown as [Promise<Connection<Schema<T>>>, Database];
   const channel =
     "BroadcastChannel" in globalThis
       ? new globalThis.BroadcastChannel(`${name}-sync`)
