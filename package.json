@@ -97,6 +97,10 @@
       "bun": "./runtime/bun.js",
       "node": "./runtime/node.js",
       "default": "./runtime/browser.js"
+    },
+    "./runtime/bun": {
+      "types": "./runtime/index.d.ts",
+      "default": "./runtime/bun.js"
     }
   },
   "optionalDependencies": {
