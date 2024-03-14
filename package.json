@@ -101,6 +101,14 @@
     "./runtime/bun": {
       "types": "./runtime/index.d.ts",
       "default": "./runtime/bun.js"
+    },
+    "./runtime/node": {
+      "types": "./runtime/index.d.ts",
+      "default": "./runtime/node.js"
+    },
+    "./runtime/browser": {
+      "types": "./runtime/index.d.ts",
+      "default": "./runtime/browser.js"
     }
   },
   "optionalDependencies": {
