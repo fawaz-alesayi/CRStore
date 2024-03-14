@@ -27,6 +27,7 @@
   ],
   "scripts": {
     "dev": "vite dev",
+    "build:runtime": "tsc -p tsconfig.declarations.json",
     "build": "svelte-kit sync && svelte-package && tsc-esm-fix --target='dist'",
     "test": "vitest",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -99,15 +100,15 @@
       "default": "./runtime/browser.js"
     },
     "./runtime/bun": {
-      "types": "./runtime/index.d.ts",
+      "types": "./runtime/bun.d.ts",
       "default": "./runtime/bun.js"
     },
     "./runtime/node": {
-      "types": "./runtime/index.d.ts",
+      "types": "./runtime/node.d.ts",
       "default": "./runtime/node.js"
     },
     "./runtime/browser": {
-      "types": "./runtime/index.d.ts",
+      "types": "./runtime/browser.d.ts",
       "default": "./runtime/browser.js"
     }
   },

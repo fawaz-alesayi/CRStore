@@ -5,18 +5,17 @@ import { platform } from "os";
 /**
  * @param {string} file
  * @param {{ binding?: string; extension?: string; }} paths
+ * @param {number | { readonly?: boolean; create?: boolean; readwrite?: boolean; }} options
  * @returns {Promise<{ database: SQLite, env: "bun" }>}
  */
-export async function load(file, paths) {
+export async function load(file, paths, options = {}) {
   if (platform() === "darwin") {
     SQLite.setCustomSQLite(
       paths.binding || "/opt/homebrew/opt/sqlite/lib/libsqlite3.dylib",
     );
   }
 
-  const database = new SQLite(file, {
-    create: true,
-  });
+  const database = new SQLite(file, options);
   
   database.run("PRAGMA journal_mode = wal");
   database.loadExtension(paths.extension || extensionPath);
